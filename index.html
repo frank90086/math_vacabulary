@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>單字測驗 1–120</title>
+<style>
+  :root{
+    --paper:#FBFAF6; --ink:#1C1A15; --ink-soft:#6B665A;
+    --line:#E5E0D4; --hl:#FFE24A; --hl-deep:#F2C500;
+    --ok:#2E7D5B; --ok-bg:#E3F3EA; --no:#C0392B; --no-bg:#FBE7E4; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+    line-height:1.6;padding-bottom:96px;}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 0;}
+  header{padding:8px 0 20px;}
+  .kicker{font-size:12px;letter-spacing:.28em;color:var(--ink-soft);font-weight:700;text-transform:uppercase;}
+  h1{font-size:30px;font-weight:800;margin:6px 0 2px;letter-spacing:-.01em;}
+  .mark{background:linear-gradient(120deg,var(--hl),var(--hl));background-repeat:no-repeat;background-size:100% 42%;background-position:0 78%;padding:0 2px;}
+  .sub{color:var(--ink-soft);font-size:14px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:16px;}
+  .panel h2{font-size:13px;letter-spacing:.14em;color:var(--ink-soft);font-weight:700;margin:0 0 12px;text-transform:uppercase;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .chip{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600;cursor:pointer;user-select:none;transition:.15s;background:var(--paper);}
+  .chip.wide{grid-column:1/-1;}
+  .chip .box{width:20px;height:20px;border-radius:6px;border:2px solid var(--ink-soft);flex:0 0 auto;position:relative;transition:.15s;}
+  .chip.on{border-color:var(--ink);background:#fff;}
+  .chip.on .box{background:var(--hl);border-color:var(--hl-deep);}
+  .chip.on .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid var(--ink);border-width:0 2.5px 2.5px 0;transform:rotate(42deg);}
+  .count-row{display:flex;gap:10px;}
+  .count-row button{flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:12px 0;font-size:15px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;font-family:inherit;}
+  .count-row button.on{border-color:var(--ink);background:var(--hl);}
+  .start{width:100%;margin-top:16px;border:none;border-radius:14px;background:var(--ink);color:var(--paper);font-size:17px;font-weight:800;padding:16px 0;cursor:pointer;font-family:inherit;letter-spacing:.02em;}
+  .start:active{transform:translateY(1px);}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 15px;margin-bottom:14px;}
+  .q-top{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
+  .q-num{font-size:13px;font-weight:800;color:var(--ink);background:var(--hl);border-radius:8px;padding:2px 9px;flex:0 0 auto;}
+  .q-type{font-size:12px;letter-spacing:.12em;color:var(--ink-soft);font-weight:700;text-transform:uppercase;}
+  .prompt{font-size:22px;font-weight:700;margin:2px 0 14px;word-break:break-word;}
+  .prompt small{display:block;font-size:14px;font-weight:600;color:var(--ink-soft);margin-top:4px;letter-spacing:.06em;}
+  .prompt.cloze{font-size:19px;font-weight:600;line-height:1.7;}
+  .blank{border-bottom:2.5px solid var(--hl-deep);padding:0 22px;margin:0 2px;}
+  .blanks{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;}
+  .opts{display:grid;gap:9px;}
+  .opt{border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;cursor:pointer;background:var(--paper);transition:.12s;display:flex;gap:10px;align-items:center;}
+  .opt .k{font-weight:800;color:var(--ink-soft);flex:0 0 auto;}
+  .opt.sel{border-color:var(--ink);background:var(--hl);font-weight:600;}
+  input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px;background:var(--paper);color:var(--ink);font-family:inherit;outline:none;transition:.15s;}
+  input[type=text]:focus{border-color:var(--ink);background:#fff;}
+  .q.correct{border-color:var(--ok);}
+  .q.wrong{border-color:var(--no);}
+  .verdict{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;font-weight:700;}
+  .verdict.ok{color:var(--ok);} .verdict.no{color:var(--no);}
+  .verdict .dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;flex:0 0 auto;}
+  .verdict.ok .dot{background:var(--ok);} .verdict.no .dot{background:var(--no);}
+  .answer{margin-top:8px;font-size:15px;color:var(--ink);background:var(--ok-bg);border-radius:10px;padding:9px 12px;line-height:1.6;}
+  .answer b{background:linear-gradient(120deg,var(--hl),var(--hl));background-repeat:no-repeat;background-size:100% 45%;background-position:0 72%;padding:0 2px;}
+  .opt.ans{border-color:var(--ok);background:var(--ok-bg);font-weight:700;}
+  .opt.badpick{border-color:var(--no);background:var(--no-bg);}
+  .selfscore{margin-top:10px;font-size:14px;color:var(--ink-soft);}
+  .selfscore button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);}
+  .selfscore button.on{background:var(--ok);color:#fff;border-color:var(--ok);}
+  .score{background:var(--ink);color:var(--paper);border-radius:16px;padding:20px 18px;margin-bottom:16px;text-align:center;}
+  .score .big{font-size:46px;font-weight:800;line-height:1;}
+  .score .big span{color:var(--hl);}
+  .score .lbl{font-size:14px;color:#C9C4B6;margin-top:6px;letter-spacing:.06em;}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(251,250,246,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));}
+  .bar .inner{max-width:640px;margin:0 auto;display:flex;gap:10px;}
+  .bar button{flex:1;border:none;border-radius:14px;padding:15px 0;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;}
+  .btn-check{background:var(--hl);color:var(--ink);}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)!important;flex:0 0 auto;padding-left:20px;padding-right:20px;}
+  .btn-dark{background:var(--ink);color:var(--paper);}
+  .hidden{display:none;}
+  .foot{text-align:center;color:var(--ink-soft);font-size:12px;padding:8px 0 20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Vocabulary · 1–120</div>
+    <h1>單字<span class="mark">測驗</span></h1>
+    <div class="sub" id="hdrSub">選好題型和題數，開始練習。</div>
+  </header>
+
+  <div id="setup">
+    <div class="panel">
+      <h2>題型</h2>
+      <div class="grid2" id="typeGrid">
+        <div class="chip on" data-type="choice"><span class="box"></span>選擇題</div>
+        <div class="chip on" data-type="spell"><span class="box"></span>填空題</div>
+        <div class="chip on" data-type="zh2en"><span class="box"></span>中翻英</div>
+        <div class="chip on" data-type="en2zh"><span class="box"></span>英翻中</div>
+        <div class="chip on wide" data-type="cloze"><span class="box"></span>例句填空</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>題數</h2>
+      <div class="count-row" id="countRow">
+        <button data-n="20" class="on">20 題</button>
+        <button data-n="40">40 題</button>
+        <button data-n="120">全部 120</button>
+      </div>
+    </div>
+    <button class="start" id="startBtn">開始測驗</button>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <div id="scoreBox"></div>
+    <div id="questions"></div>
+  </div>
+
+  <div class="foot">中翻英/英翻中只考單字 · 例句填空每次隨機換句子</div>
+</div>
+
+<div class="bar hidden" id="bar">
+  <div class="inner" id="barInner">
+    <button class="btn-ghost" id="backBtn">重設</button>
+    <button class="btn-check" id="checkBtn">一鍵對答案</button>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  {no:1,en:"abroad",zh:"[副]在國外",keys:["在國外","國外","出國"],ex:["My sister is studying {}.","They travel {} every summer.","He wants to work {} after school.","Have you ever been {}?","We flew {} for our holiday."]},
+  {no:2,en:"across",zh:"[介]橫越;穿過",keys:["橫越","穿過","越過"],ex:["The dog ran {} the road.","We walked {} the bridge.","There is a store {} the street.","She swam {} the river.","A cat jumped {} the wall."]},
+  {no:3,en:"act",zh:"[動]扮演;[名]行動,法案",keys:["扮演","行動","法案","演"],ex:["She will {} in the new play.","We must {} quickly to help them.","He can {} like a hero on stage.","Please {} calm during the test.","It is time to {}, not to talk."]},
+  {no:4,en:"action",zh:"[名]動作",keys:["動作","行動"],ex:["The movie is full of {}.","We need to take {} now.","His quick {} saved the boy.","Talk less and take more {}.","The camera caught every {}."]},
+  {no:5,en:"actor",zh:"[名]男演員",keys:["男演員","演員"],ex:["He is a famous {}.","The {} played a brave king.","My brother wants to be an {}.","That {} won a big prize.","Every {} on the stage was great."]},
+  {no:6,en:"actress",zh:"[名]女演員",keys:["女演員","演員"],ex:["She is a talented {}.","The {} smiled at the camera.","My aunt is a movie {}.","That {} sang beautifully.","The young {} became famous fast."]},
+  {no:7,en:"ahead",zh:"[副]在前;向前;預先",keys:["在前","向前","預先"],ex:["Go straight {} and turn left.","There is a school {} of us.","Please plan {} for the trip.","The runner is far {}.","Look {}, not back."]},
+  {no:8,en:"ant",zh:"[名]螞蟻",keys:["螞蟻"],ex:["An {} is very small but strong.","The {} carried a piece of bread.","There is an {} on the table.","Watch out for that {}.","An {} lives in a big group."]},
+  {no:9,en:"attack",zh:"[動]進攻;襲擊;[名]攻擊",keys:["進攻","襲擊","攻擊"],ex:["The dog may {} strangers.","They planned to {} at night.","The soldiers began their {}.","A shark can {} very fast.","The team's {} was strong."]},
+  {no:10,en:"badminton",zh:"[名]羽毛球",keys:["羽毛球"],ex:["Let's play {} after school.","She is good at {}.","We need two rackets for {}.","They watched a {} game on TV.","{} is a fun indoor sport."]},
+  {no:11,en:"bake",zh:"[動]烘;烤",keys:["烘","烤","烘烤","烤焙"],ex:["My mom will {} a cake today.","Let's {} some cookies together.","She likes to {} bread on Sundays.","Can you {} a pie for me?","We {} pizza in the oven."]},
+  {no:12,en:"balcony",zh:"[名]陽臺",keys:["陽臺","陽台","露臺"],ex:["She stood on the {} to watch the rain.","There are flowers on our {}.","The {} looks over the garden.","We ate dinner on the {}.","He waved from the {}."]},
+  {no:13,en:"barbecue",zh:"[名]烤肉",keys:["烤肉","燒烤"],ex:["We had a {} in the park.","The {} smells so good.","They cooked meat at the {}.","Let's have a {} this weekend.","A {} is fun with friends."]},
+  {no:14,en:"base",zh:"[名]基;底;基部",keys:["基","底","基部","基地","底部"],ex:["The {} of the tree is very wide.","Write your name at the {} of the page.","The lamp has a heavy {}.","Soldiers returned to the {}.","The {} of the mountain is green."]},
+  {no:15,en:"bat",zh:"[名]球棒;蝙蝠",keys:["球棒","蝙蝠","棒"],ex:["He hit the ball with a {}.","A {} sleeps during the day.","The {} flew out of the cave.","She bought a new baseball {}.","A {} can fly in the dark."]},
+  {no:16,en:"bean",zh:"[名]豆莢;豆子",keys:["豆莢","豆子","豆"],ex:["A green {} is good for you.","She dropped a {} on the floor.","Each {} is small and round.","The plant grew from a tiny {}.","There is a {} in the soup."]},
+  {no:17,en:"bench",zh:"[名]長凳;長椅",keys:["長凳","長椅","板凳"],ex:["We sat on a {} in the park.","The old man rested on the {}.","There is a wooden {} by the door.","She painted the {} green.","Let's meet at the {} near the pond."]},
+  {no:18,en:"blanket",zh:"[名]毯子",keys:["毯子","毛毯","毯"],ex:["She covered the baby with a {}.","I need a warm {} tonight.","The {} is soft and thick.","He wrapped himself in a {}.","Bring a {} for the picnic."]},
+  {no:19,en:"boil",zh:"[動](水等)沸騰;開;滾",keys:["沸騰","開","滾","煮沸","煮開"],ex:["Please {} the water for tea.","The soup will {} in a minute.","Wait for the milk to {}.","We {} eggs for breakfast.","Let the water {} before you cook."]},
+  {no:20,en:"bow",zh:"[動]鞠躬;[名]弓",keys:["鞠躬","弓"],ex:["The actors {} at the end of the show.","He gave a deep {} to the queen.","She used a {} to shoot the arrow.","Please {} to say thank you.","The hunter carried a {} and arrows."]},
+  {no:21,en:"bug",zh:"[名]小蟲",keys:["小蟲","蟲","蟲子"],ex:["A {} crawled up my arm.","There is a {} on the leaf.","That {} has many legs.","She found a {} in the box.","A small {} flew into the room."]},
+  {no:22,en:"bun",zh:"[名]小圓麵包",keys:["小圓麵包","麵包","圓麵包"],ex:["I ate a warm {} for breakfast.","The {} is soft and sweet.","She put butter on her {}.","There is one {} left in the bag.","The hot dog needs a {}."]},
+  {no:23,en:"butterfly",zh:"[名]蝴蝶",keys:["蝴蝶","蝶"],ex:["A {} landed on the flower.","The {} has colorful wings.","We saw a {} in the garden.","A {} flew over the pond.","The child chased a {}."]},
+  {no:24,en:"cage",zh:"[名]鳥籠;獸籠",keys:["鳥籠","獸籠","籠子","籠"],ex:["The bird sang in its {}.","Don't open the tiger's {}.","We keep the rabbit in a {}.","The {} is too small for the dog.","She cleaned the bird {}."]},
+  {no:25,en:"candle",zh:"[名]蠟燭",keys:["蠟燭","燭"],ex:["She lit a {} on the cake.","The {} gave a soft light.","We used a {} during the blackout.","Blow out the {} and make a wish.","A red {} sat on the table."]},
+  {no:26,en:"castle",zh:"[名]城堡",keys:["城堡","堡"],ex:["The king lives in a big {}.","We visited an old {} in Europe.","The {} has tall stone walls.","A ghost may live in that {}.","The children built a sand {}."]},
+  {no:27,en:"centimeter",zh:"[名]公分",keys:["公分","釐米","厘米"],ex:["The bug is one {} long.","Move it one {} to the left.","A ruler shows every {}.","The nail is about one {} short.","Draw a line one {} above this."]},
+  {no:28,en:"chess",zh:"[名]西洋棋",keys:["西洋棋","棋"],ex:["Let's play {} tonight.","He is very good at {}.","{} needs a lot of thinking.","They played {} for two hours.","My grandpa taught me {}."]},
+  {no:29,en:"choose",zh:"[動]選擇",keys:["選擇","選","挑選"],ex:["You can {} any color you like.","It is hard to {} the best one.","Please {} a book to read.","We must {} a leader today.","{} wisely before you buy it."]},
+  {no:30,en:"clap",zh:"[動]拍(手);鼓(掌)",keys:["拍手","鼓掌","拍","鼓"],ex:["The crowd began to {} loudly.","Please {} for the singer.","We {} when the show ends.","Everyone stood up to {}.","Let's {} to keep the beat."]},
+  {no:31,en:"clerk",zh:"[名]店員;辦事員;職員",keys:["店員","辦事員","職員"],ex:["The {} helped me find the book.","Ask the {} about the price.","She works as a {} in a store.","The bank {} counted the money.","The {} was friendly and kind."]},
+  {no:32,en:"cola",zh:"[名]可樂",keys:["可樂"],ex:["I want a cold {} with ice.","He drank a can of {}.","The {} is too sweet for me.","Would you like some {}?","A bottle of {} is on the table."]},
+  {no:33,en:"comb",zh:"[動]梳理;[名]梳子",keys:["梳理","梳子","梳"],ex:["Please {} your hair before school.","She used a {} to fix her hair.","He can't find his {}.","{} the dog's fur gently.","The {} is on the shelf."]},
+  {no:34,en:"corner",zh:"[名]角落",keys:["角落","角","轉角"],ex:["The chair is in the {} of the room.","Turn at the next {}.","A spider sat in the {}.","The store is on the {} of the street.","He hid in a dark {}."]},
+  {no:35,en:"course",zh:"[名]課程;科目",keys:["課程","科目"],ex:["I took an English {} last year.","This {} is very useful.","She teaches a cooking {}.","The math {} is hard but fun.","He signed up for a new {}."]},
+  {no:36,en:"deal",zh:"[動]處理;對付;對待;[名]交易",keys:["處理","對付","對待","交易"],ex:["I will {} with this problem now.","We made a good {} at the store.","He knows how to {} with people.","That was a fair {}.","Let's {} with it tomorrow."]},
+  {no:37,en:"dentist",zh:"[名]牙醫",keys:["牙醫"],ex:["I have to see the {} today.","The {} checked my teeth.","Don't be afraid of the {}.","She wants to become a {}.","The {} told me to brush more."]},
+  {no:38,en:"dodgeball",zh:"[名]躲避球",keys:["躲避球"],ex:["We played {} in P.E. class.","{} is a fast and fun game.","He is great at {}.","The kids love to play {}.","Our class won the {} match."]},
+  {no:39,en:"dot",zh:"[名]點;小圓點",keys:["點","小圓點","圓點"],ex:["Put a {} at the end of the line.","Her dress has a red {} pattern.","The star looked like a tiny {}.","Draw a small {} here.","There is a black {} on the wall."]},
+  {no:40,en:"dragon",zh:"[名]龍",keys:["龍"],ex:["The {} breathed fire.","A brave knight fought the {}.","The {} lived in a dark cave.","Children love stories about a {}.","The {} flew over the castle."]},
+  {no:41,en:"drawer",zh:"[名]抽屜",keys:["抽屜"],ex:["Put the socks in the {}.","The key is in the top {}.","She opened the {} to find a pen.","The {} is full of old photos.","Please close the {}."]},
+  {no:42,en:"drum",zh:"[名]鼓",keys:["鼓"],ex:["He can play the {} very well.","The {} is loud and fun.","She hit the {} with a stick.","A big {} sat on the stage.","The band needs a {}."]},
+  {no:43,en:"duck",zh:"[名]鴨",keys:["鴨","鴨子"],ex:["A {} is swimming in the pond.","The {} has yellow feet.","We fed the {} some bread.","A baby {} follows its mother.","The {} quacked loudly."]},
+  {no:44,en:"dumpling",zh:"[名]餃子",keys:["餃子","水餃","餃"],ex:["Each {} is full of meat.","She made a big {} for me.","This {} tastes wonderful.","We eat a {} for good luck.","He dropped a {} on the floor."]},
+  {no:45,en:"Easter",zh:"[名]復活節",keys:["復活節"],ex:["We paint eggs at {}.","{} comes in the spring.","The children hunt eggs on {}.","Happy {} to you!","We visited grandma on {}."]},
+  {no:46,en:"engineer",zh:"[名]工程師",keys:["工程師"],ex:["My father is an {}.","The {} designed a new bridge.","She wants to be an {}.","An {} fixed the machine.","The {} drew the plans."]},
+  {no:47,en:"envelope",zh:"[名]信封",keys:["信封"],ex:["Put the letter in the {}.","She sealed the {} and mailed it.","The {} has a stamp on it.","Write the address on the {}.","There is money in the {}."]},
+  {no:48,en:"fail",zh:"[動]失敗;不及格",keys:["失敗","不及格"],ex:["Don't give up, or you will {}.","He was afraid to {} the test.","If we try, we won't {}.","She did not {} the exam.","Everyone can {} sometimes."]},
+  {no:49,en:"far",zh:"[形]遠的",keys:["遠的","遠"],ex:["The school is not {} from here.","How {} is the station?","The moon is very {} away.","We walked a {} way to the beach.","His house is too {} to visit."]},
+  {no:50,en:"feed",zh:"[動]吃;餵養",keys:["吃","餵養","餵","餵食"],ex:["Please {} the cat this morning.","We {} the ducks at the pond.","She likes to {} her baby.","Don't {} the animals at the zoo.","He gets up early to {} the hens."]},
+  {no:51,en:"fever",zh:"[名]發燒",keys:["發燒","發熱"],ex:["She has a high {} today.","Take this medicine for your {}.","A {} made him stay in bed.","My {} is gone now.","The doctor checked his {}."]},
+  {no:52,en:"fight",zh:"[動]打架;作戰;[名]打架;戰鬥",keys:["打架","作戰","戰鬥","打鬥"],ex:["The two boys began to {}.","We should not {} with friends.","The soldiers had to {} for peace.","There was a big {} at school.","Don't {}, just talk it out."]},
+  {no:53,en:"flute",zh:"[名]橫笛",keys:["橫笛","笛","長笛","笛子"],ex:["She can play the {} beautifully.","The {} makes a soft sound.","He practices the {} every day.","A silver {} lay on the table.","I want to learn the {}."]},
+  {no:54,en:"fox",zh:"[名]狐狸",keys:["狐狸","狐"],ex:["A {} is a clever animal.","The {} has a long tail.","We saw a red {} in the woods.","The {} ran into the forest.","A {} hunts small animals."]},
+  {no:55,en:"French fries",zh:"[名]薯條",keys:["薯條","炸薯條"],ex:["I want some {} with my burger.","The {} are hot and crispy.","She shared her {} with me.","These {} taste too salty.","We ordered a large box of {}."]},
+  {no:56,en:"frisbee",zh:"[名]飛碟;飛盤",keys:["飛碟","飛盤"],ex:["Let's throw a {} at the park.","The dog caught the {}.","He threw the {} very far.","A {} flew over my head.","We played with a {} on the beach."]},
+  {no:57,en:"frog",zh:"[名]青蛙",keys:["青蛙","蛙"],ex:["A {} jumped into the pond.","The {} is green and small.","We heard a {} at night.","The {} sat on a leaf.","A {} can jump very high."]},
+  {no:58,en:"fry",zh:"[動]油炸;[名]炸薯條",keys:["油炸","炸薯條","炸","煎"],ex:["Please {} the eggs for breakfast.","She will {} some chicken tonight.","Don't {} the fish too long.","We {} rice with vegetables.","He likes to {} potatoes."]},
+  {no:59,en:"gate",zh:"[名]柵門;登機門",keys:["柵門","登機門","門","大門"],ex:["Please close the {} behind you.","We waited at the airport {}.","The {} is locked at night.","A dog ran through the open {}.","Meet me at the school {}."]},
+  {no:60,en:"ghost",zh:"[名]鬼",keys:["鬼","幽靈"],ex:["The old house may have a {}.","She was scared of the {}.","A {} appeared in the story.","Do you believe in a {}?","The {} floated through the wall."]},
+  {no:61,en:"giant",zh:"[形]巨大的;[名]巨人",keys:["巨大的","巨人","巨大"],ex:["A {} lived at the top of the hill.","The story is about a friendly {}.","He ate a {} sandwich.","A {} wave hit the boat.","The {} had huge feet."]},
+  {no:62,en:"glasses",zh:"[名]眼鏡",keys:["眼鏡"],ex:["I can't read without my {}.","Her new {} are very cute.","He cleaned his {} with a cloth.","Where did I put my {}?","These {} help me see far."]},
+  {no:63,en:"glue",zh:"[動]黏住;緊附;[名]膠;膠水",keys:["黏住","緊附","膠","膠水"],ex:["Use {} to stick the paper.","Please {} the two pieces together.","The {} is on the desk.","She spread {} on the card.","This {} dries very fast."]},
+  {no:64,en:"goose",zh:"[名]鵝",keys:["鵝"],ex:["A {} is bigger than a duck.","The {} chased the little boy.","We saw a white {} by the lake.","The {} has a long neck.","A {} honked loudly."]},
+  {no:65,en:"gram",zh:"[名]公克",keys:["公克","克"],ex:["This coin weighs one {}.","Add one {} of salt to the soup.","A paper clip is about one {}.","The recipe needs one {} of yeast.","It is only one {} heavier."]},
+  {no:66,en:"grape",zh:"[名]葡萄",keys:["葡萄"],ex:["A {} is small and sweet.","She ate a purple {}.","This {} tastes sour.","He picked a {} from the bunch.","A green {} fell on the floor."]},
+  {no:67,en:"guava",zh:"[名]番石榴",keys:["番石榴","芭樂"],ex:["A {} is a healthy fruit.","I like to eat a fresh {}.","The {} is green outside.","She cut the {} into slices.","This {} is very juicy."]},
+  {no:68,en:"guitar",zh:"[名]吉他",keys:["吉他"],ex:["He plays the {} in a band.","The {} has six strings.","She sang and played the {}.","I want to learn the {}.","A wooden {} hung on the wall."]},
+  {no:69,en:"guy",zh:"[名]傢伙;人",keys:["傢伙","人","男人"],ex:["That {} is very kind.","Do you know the {} over there?","He is a funny {}.","A tall {} helped me carry the box.","The new {} is on our team."]},
+  {no:70,en:"gym",zh:"[名]體育館;體育;體操",keys:["體育館","體育","體操","健身房"],ex:["We play basketball in the {}.","She works out at the {}.","The {} is next to the library.","I have {} class this afternoon.","He goes to the {} every day."]},
+  {no:71,en:"Halloween",zh:"[名]萬聖節",keys:["萬聖節"],ex:["We wear costumes on {}.","{} is at the end of October.","The kids get candy on {}.","She carved a pumpkin for {}.","Happy {} to everyone!"]},
+  {no:72,en:"hang",zh:"[動]把...掛起;吊",keys:["掛起","吊","掛","懸掛"],ex:["Please {} your coat on the hook.","We {} pictures on the wall.","She will {} the clothes to dry.","{} the lantern by the door.","He likes to {} a flag outside."]},
+  {no:73,en:"hen",zh:"[名]母雞",keys:["母雞","雞"],ex:["The {} laid an egg today.","A {} has soft feathers.","The {} sat on her eggs.","We keep a {} in the yard.","The {} clucked in the morning."]},
+  {no:74,en:"hey",zh:"[感]嗨;喂",keys:["嗨","喂"],ex:["{}, wait for me!","{}, how are you today?","{}, look over there!","{}, that's my seat.","{}, can you help me?"]},
+  {no:75,en:"hike",zh:"[動]徒步旅行;[名]徒步旅行",keys:["徒步旅行","健行","遠足"],ex:["We will {} up the mountain.","They went on a long {}.","Let's {} in the forest tomorrow.","The {} took three hours.","She likes to {} on weekends."]},
+  {no:76,en:"hippo",zh:"[名]河馬",keys:["河馬"],ex:["A {} loves to stay in the water.","The {} has a very big mouth.","We saw a {} at the zoo.","The {} is a heavy animal.","A baby {} swam near its mother."]},
+  {no:77,en:"honey",zh:"[名]蜂蜜;心愛的人",keys:["蜂蜜","心愛的人","親愛的"],ex:["I put {} in my tea.","Bees make sweet {}.","This {} tastes wonderful.","She spread {} on the bread.","A jar of {} is on the shelf."]},
+  {no:78,en:"hop",zh:"[動]單腳跳",keys:["單腳跳","跳","蹦跳"],ex:["The rabbit can {} very fast.","Try to {} on one foot.","The frog will {} into the pond.","Let's {} across the stones.","The bird began to {} on the grass."]},
+  {no:79,en:"housewife",zh:"[名]家庭主婦",keys:["家庭主婦","主婦"],ex:["My mother is a {}.","The {} cooks for her family.","A {} works hard at home.","She became a {} after marriage.","The {} cleaned the whole house."]},
+  {no:80,en:"hunt",zh:"[動]追獵",keys:["追獵","打獵","獵","狩獵"],ex:["Lions {} for food at night.","The cat likes to {} mice.","They went out to {} in the woods.","A fox will {} small animals.","We {} for eggs on Easter."]},
+  {no:81,en:"inch",zh:"[名]英吋",keys:["英吋"],ex:["The bug is only one {} long.","Move it just an {} to the right.","My little brother grew an {} taller last year.","Cut the paper one {} shorter.","She was an {} away from winning."]},
+  {no:82,en:"insect",zh:"[名]昆蟲",keys:["昆蟲"],ex:["A butterfly is a beautiful {}.","That {} has six legs.","Don't be afraid of every small {}.","We caught an {} in the garden.","An ant is a tiny {}."]},
+  {no:83,en:"interview",zh:"[動]面談;採訪 [名]面談;採訪",keys:["面談","採訪","訪問"],ex:["I have a job {} tomorrow morning.","The reporter will {} the famous singer.","She was nervous before her {}.","They came to {} people on the street.","The {} lasted about thirty minutes."]},
+  {no:84,en:"invite",zh:"[動]邀請",keys:["邀請","邀"],ex:["I want to {} you to my birthday party.","Did they {} her to the wedding?","Please {} your friends to join us.","We should {} the new student to lunch.","He forgot to {} his cousin."]},
+  {no:85,en:"kangaroo",zh:"[名]袋鼠",keys:["袋鼠"],ex:["A {} can jump very high.","The baby {} stays in its mother's pouch.","We saw a {} at the zoo.","A {} lives in Australia.","The {} hopped across the road."]},
+  {no:86,en:"koala",zh:"[名]無尾熊",keys:["無尾熊","澳洲產無尾熊","樹熊"],ex:["A {} sleeps most of the day.","The {} is holding a tree branch.","A {} loves to eat leaves.","We took a photo with a {}.","The little {} looks so cute."]},
+  {no:87,en:"lantern",zh:"[名]燈籠",keys:["燈籠"],ex:["We hung a red {} for the festival.","The paper {} glowed in the dark.","She carried a {} into the cave.","Each child made a {} at school.","A bright {} lit up the street."]},
+  {no:88,en:"lawyer",zh:"[名]律師",keys:["律師"],ex:["My uncle is a {}.","The {} helped us with the contract.","You should ask a {} for advice.","She wants to become a {}.","The {} spoke to the judge."]},
+  {no:89,en:"lovely",zh:"[形]動人的;可愛的",keys:["動人的","動人","可愛的","可愛"],ex:["What a {} garden you have!","She wore a {} dress to the party.","It's a {} day for a picnic.","They live in a {} little house.","Thank you for the {} gift."]},
+  {no:90,en:"mad",zh:"[形]發火;發瘋;發狂的",keys:["發火","發瘋","發狂的","發狂","生氣"],ex:["Dad was {} when I broke the window.","Don't be {} at me, please.","She got {} because he was late.","Are you still {} about the game?","The noise is driving me {}."]},
+  {no:91,en:"marker",zh:"[名]標誌;白板筆;馬克筆",keys:["標誌","白板筆","馬克筆"],ex:["The teacher wrote on the board with a {}.","Use a red {} to circle the answer.","I need a black {} to draw this.","He put a {} on the map.","Can I borrow your {}?"]},
+  {no:92,en:"mask",zh:"[名]面具",keys:["面具","口罩"],ex:["The doctor wore a {} in the hospital.","He put on a scary {} for the party.","She hid her face behind a {}.","Please wear a {} when you are sick.","The {} covered his whole face."]},
+  {no:93,en:"mat",zh:"[名]蓆子;墊子",keys:["蓆子","墊子","席子","地墊"],ex:["Please wipe your shoes on the {}.","We sat on a {} for the picnic.","The dog sleeps on a soft {}.","Roll out your yoga {} on the floor.","There is a welcome {} by the door."]},
+  {no:94,en:"mop",zh:"[動]拖洗;擦去 [名]拖把",keys:["拖洗","擦去","拖把","拖地"],ex:["I will {} the kitchen floor after dinner.","Please {} up the water on the floor.","She used a {} to clean the room.","He forgot to {} under the table.","Grab the {} and start cleaning."]},
+  {no:95,en:"metro",zh:"[名]大眾捷運系統;地下鐵",keys:["大眾捷運系統","地下鐵","捷運","地鐵"],ex:["We took the {} to the city center.","The {} is faster than the bus.","I ride the {} to school every day.","The {} station is near my house.","Let's catch the next {}."]},
+  {no:96,en:"mud",zh:"[名]泥巴",keys:["泥巴","泥","爛泥"],ex:["The kids played in the {} after the rain.","My shoes are covered in {}.","The pig rolled in the {}.","There is {} all over the floor.","Don't step in that {}."]},
+  {no:97,en:"nail",zh:"[名]釘子;指甲",keys:["釘子","指甲"],ex:["He hit the {} with a hammer.","There is a {} sticking out of the board.","She bit her {} because she was worried.","Be careful, that {} is very sharp.","Hang the picture on this {}."]},
+  {no:98,en:"nature",zh:"[名]自然",keys:["自然","大自然"],ex:["We should protect {}.","I love the beauty of {}.","Walking in {} makes me happy.","This show is about {} and animals.","It is human {} to feel afraid sometimes."]},
+  {no:99,en:"neighbor",zh:"[名]鄰居",keys:["鄰居"],ex:["My {} is very friendly.","Our new {} moved in last week.","I borrowed some sugar from my {}.","Be kind to your {}.","The {} next door has a big dog."]},
+  {no:100,en:"newspaper",zh:"[名]報紙",keys:["報紙"],ex:["Dad reads the {} every morning.","I saw the news in today's {}.","She works for a local {}.","Wrap the glass in {} so it won't break.","The story was on the front page of the {}."]},
+  {no:101,en:"note",zh:"[動]注意;記下 [名]筆記;音符;記錄",keys:["注意","記下","筆記","音符","記錄","便條"],ex:["I left a {} on the table for you.","The teacher asked us to {} the new words.","She wrote a short {} to her friend.","Read the {} at the bottom of the page.","Please {} the date of the meeting."]},
+  {no:102,en:"ox",zh:"[名]公牛",keys:["公牛","牛"],ex:["The farmer used an {} to pull the cart.","An {} is a strong animal.","The {} worked hard in the field.","He is as strong as an {}.","An {} has two horns."]},
+  {no:103,en:"papaya",zh:"[名]木瓜",keys:["木瓜"],ex:["I had a {} for breakfast.","A ripe {} is orange inside.","She cut the {} into small pieces.","This {} tastes very sweet.","We bought a big {} at the market."]},
+  {no:104,en:"paste",zh:"[動]黏貼 [名]漿糊",keys:["黏貼","漿糊","貼上"],ex:["Copy the words and {} them here.","Use glue to {} the picture in your book.","She spread some {} on the paper.","Cut the photo and {} it on the card.","Mix the flour and water into a {}."]},
+  {no:105,en:"peach",zh:"[名]桃子",keys:["桃子","桃"],ex:["A {} is soft and sweet.","I ate a juicy {} after lunch.","The {} tree is full of fruit.","She picked a ripe {} from the branch.","This {} smells wonderful."]},
+  {no:106,en:"pear",zh:"[名]梨子",keys:["梨子","梨"],ex:["A {} is green or yellow.","I bought a {} at the store.","The {} is sweet and juicy.","She sliced a {} for the salad.","There is one {} left in the bowl."]},
+  {no:107,en:"photo",zh:"[名]相片",keys:["相片","照片"],ex:["Let's take a {} together.","She showed me a {} of her cat.","I keep this {} in my wallet.","Please send me the {} later.","This is a nice {} of your family."]},
+  {no:108,en:"pin",zh:"[名]大頭針;胸針",keys:["大頭針","胸針","別針"],ex:["Use a {} to hold the papers together.","She wore a pretty {} on her coat.","Be careful, the {} is sharp.","He stuck a {} in the map.","I need a {} to fix my dress."]},
+  {no:109,en:"pipe",zh:"[名]管子",keys:["管子","水管","管"],ex:["Water flows through the {}.","The {} under the sink is leaking.","A long {} runs along the wall.","Smoke comes out of that {}.","The workers fixed the broken {}."]},
+  {no:110,en:"planet",zh:"[名]行星",keys:["行星"],ex:["Earth is our home {}.","Mars is a red {}.","Which {} is the biggest?","We must protect our {}.","Each {} moves around the sun."]},
+  {no:111,en:"plant",zh:"[動]栽種;播種 [名]植物;農作物;工廠",keys:["栽種","播種","植物","農作物","工廠","種植"],ex:["Let's {} some flowers in the garden.","This {} needs a lot of water.","Water the {} every day.","They {} rice in the spring.","A green {} sits on my desk."]},
+  {no:112,en:"plate",zh:"[名]盤;碟",keys:["盤","碟","盤子","碟子"],ex:["Put the food on your {}.","She washed every {} after dinner.","The {} fell and broke.","There is a cookie on the {}.","Pass me a clean {}, please."]},
+  {no:113,en:"pleasure",zh:"[名]愉快",keys:["愉快","樂趣","高興"],ex:["It is a {} to meet you.","She reads books for {}.","Helping others gives me great {}.","With {}, I will help you.","The trip was a real {}."]},
+  {no:114,en:"pocket",zh:"[名]口袋",keys:["口袋"],ex:["He put the key in his {}.","My {} is full of coins.","There is a hole in my {}.","She kept the note in her {}.","Empty your {} before you wash the pants."]},
+  {no:115,en:"pond",zh:"[名]池塘",keys:["池塘","水池"],ex:["Ducks swim in the {}.","There are fish in the {}.","We skated on the frozen {}.","A frog jumped into the {}.","The {} is behind our house."]},
+  {no:116,en:"pool",zh:"[名]水池;美式撞球",keys:["水池","美式撞球","撞球","游泳池"],ex:["The kids swim in the {} every summer.","Let's play {} after class.","The {} is too cold today.","She dived into the {}.","There is a small {} in the park."]},
+  {no:117,en:"pot",zh:"[名]罐;鍋",keys:["罐","鍋","鍋子","罐子"],ex:["Boil the water in a {}.","She cooked soup in a big {}.","Put the plant in a {}.","The {} is too hot to touch.","There is rice in the {}."]},
+  {no:118,en:"power",zh:"[名]權力;動力",keys:["權力","動力","力量","電力"],ex:["The storm cut off the {}.","The king had great {}.","This machine needs more {}.","Knowledge is {}.","We lost {} during the typhoon."]},
+  {no:119,en:"pray",zh:"[動]禱告",keys:["禱告","祈禱"],ex:["They {} before every meal.","She went to church to {}.","We {} for good weather tomorrow.","He closed his eyes to {}.","People {} for peace."]},
+  {no:120,en:"prince",zh:"[名]王子",keys:["王子"],ex:["The {} lived in a big castle.","A brave {} saved the princess.","The young {} will become king.","She met a {} in her dream.","The {} rode a white horse."]},
+];
+
+const TYPE_LABEL = {choice:"選擇題",spell:"填空題",zh2en:"中翻英",en2zh:"英翻中",cloze:"例句填空"};
+let picked = {choice:true,spell:true,zh2en:true,en2zh:true,cloze:true};
+let count = 20;
+let questions = [];
+let graded = false;
+
+document.querySelectorAll('#typeGrid .chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    const t=c.dataset.type;
+    if(c.classList.contains('on') && Object.values(picked).filter(Boolean).length===1) return;
+    c.classList.toggle('on');
+    picked[t]=c.classList.contains('on');
+  });
+});
+document.querySelectorAll('#countRow button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#countRow button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); count=parseInt(b.dataset.n,10);
+  });
+});
+document.getElementById('startBtn').addEventListener('click',start);
+document.getElementById('checkBtn').addEventListener('click',check);
+document.getElementById('backBtn').addEventListener('click',reset);
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function norm(s){return (s||"").toLowerCase().replace(/[\s.．,，、;；!?'"]/g,"").trim();}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function makeMask(w){
+  const len=w.length; const styles=[];
+  styles.push(i=> i===0);
+  if(len>=4) styles.push(i=> i===0||i===len-1);
+  styles.push(i=> "aeiou".includes(w[i]));
+  styles.push(()=> Math.random()<0.45);
+  const pick=styles[Math.floor(Math.random()*styles.length)];
+  let reveal=w.split("").map((_,i)=>!!pick(i));
+  if(!reveal.some(Boolean)) reveal[0]=true;
+  if(reveal.every(Boolean)) reveal[Math.floor(len/2)]=false;
+  if(len<=2) reveal=w.split("").map((_,i)=>i===0);
+  return w.split("").map((ch,i)=> reveal[i]?ch:"＿").join(" ");
+}
+
+function checkBar(){
+  document.getElementById('barInner').innerHTML=
+    `<button class="btn-ghost" id="backBtn">重設</button>`+
+    `<button class="btn-check" id="checkBtn">一鍵對答案</button>`;
+  document.getElementById('checkBtn').addEventListener('click',check);
+  document.getElementById('backBtn').addEventListener('click',reset);
+}
+
+function start(){
+  const types=Object.keys(picked).filter(t=>picked[t]);
+  const pool=shuffle(WORDS).slice(0,count);
+  questions=pool.map((w,i)=>{
+    let type=types[Math.floor(Math.random()*types.length)];
+    if(type==="cloze" && (!w.ex||!w.ex.length)) type="spell";
+    const q={idx:i,type,w,ans:null};
+    if(type==="choice"){
+      const others=shuffle(WORDS.filter(x=>x.no!==w.no)).slice(0,3);
+      q.dir = Math.random()<0.5 ? "en2zh":"zh2en";
+      if(q.dir==="en2zh"){ q.prompt=w.en; q.options=shuffle([w,...others]).map(x=>x.zh); q.correct=w.zh; }
+      else{ q.prompt=w.zh; q.options=shuffle([w,...others]).map(x=>x.en); q.correct=w.en; }
+    }else if(type==="spell"){
+      q.mask=makeMask(w.en);
+    }else if(type==="cloze"){
+      q.sentence=w.ex[Math.floor(Math.random()*w.ex.length)];
+    }
+    return q;
+  });
+  graded=false;
+  document.getElementById('scoreBox').innerHTML="";
+  checkBar();
+  render();
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  document.getElementById('bar').classList.remove('hidden');
+  document.getElementById('hdrSub').textContent="作答完後，按下方「一鍵對答案」。";
+  window.scrollTo(0,0);
+}
+
+function render(){
+  const box=document.getElementById('questions'); box.innerHTML="";
+  questions.forEach(q=>{
+    const w=q.w; const el=document.createElement('div');
+    el.className="q"; el.id="q"+q.idx;
+    let promptHTML="", bodyHTML="";
+    if(q.type==="choice"){
+      promptHTML=`<div class="prompt">${esc(q.prompt)}</div>`;
+      bodyHTML=`<div class="opts">`+q.options.map((o,k)=>
+        `<div class="opt" data-opt="${k}"><span class="k">${"ABCD"[k]}</span><span>${esc(o)}</span></div>`).join("")+`</div>`;
+    }else if(q.type==="spell"){
+      promptHTML=`<div class="prompt">${esc(w.zh)}<small class="blanks">${q.mask}　（${w.en.length} 個字母）</small></div>`;
+      bodyHTML=`<input type="text" autocomplete="off" autocapitalize="none" placeholder="拼出完整單字…">`;
+    }else if(q.type==="zh2en"){
+      promptHTML=`<div class="prompt">${esc(w.zh)}</div>`;
+      bodyHTML=`<input type="text" autocomplete="off" autocapitalize="none" placeholder="輸入英文單字…">`;
+    }else if(q.type==="en2zh"){
+      promptHTML=`<div class="prompt">${esc(w.en)}</div>`;
+      bodyHTML=`<input type="text" autocomplete="off" placeholder="輸入中文意思…">`;
+    }else if(q.type==="cloze"){
+      const sent=esc(q.sentence).replace("{}",`<span class="blank"></span>`);
+      promptHTML=`<div class="prompt cloze">${sent}<small>（${esc(w.zh)}）</small></div>`;
+      bodyHTML=`<input type="text" autocomplete="off" autocapitalize="none" placeholder="填入這個單字…">`;
+    }
+    el.innerHTML=`<div class="q-top"><span class="q-num">${q.idx+1}</span><span class="q-type">${TYPE_LABEL[q.type]}</span></div>${promptHTML}${bodyHTML}`;
+    box.appendChild(el);
+    if(q.type==="choice"){
+      el.querySelectorAll('.opt').forEach(op=>{
+        op.addEventListener('click',()=>{
+          if(graded)return;
+          el.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+          op.classList.add('sel');
+          q.ans=q.options[parseInt(op.dataset.opt,10)];
+        });
+      });
+    }
+  });
+}
+
+function isRight(q){
+  if(q.type==="choice") return q.ans===q.correct;
+  const input=document.querySelector('#q'+q.idx+' input');
+  const val=input?input.value:"";
+  if(q.type==="spell"||q.type==="zh2en"||q.type==="cloze") return norm(val)===norm(q.w.en);
+  if(q.type==="en2zh"){ const n=norm(val); if(!n)return false; return q.w.keys.some(k=>norm(k)===n); }
+  return false;
+}
+
+function check(){
+  graded=true; let score=0;
+  questions.forEach(q=>{
+    const el=document.getElementById('q'+q.idx);
+    const ok=isRight(q); q.right=ok; if(ok)score++;
+    el.classList.add(ok?"correct":"wrong");
+    const input=el.querySelector('input'); if(input) input.readOnly=true;
+    if(q.type==="choice"){
+      el.querySelectorAll('.opt').forEach(op=>{
+        const txt=op.querySelector('span:last-child').textContent;
+        op.style.pointerEvents="none";
+        if(txt===q.correct) op.classList.add('ans');
+        else if(op.classList.contains('sel')) op.classList.add('badpick');
+      });
+    }
+    const v=document.createElement('div');
+    v.className="verdict "+(ok?"ok":"no");
+    v.innerHTML=`<span class="dot">${ok?"✓":"✕"}</span>${ok?"答對":"再看一次"}`;
+    el.appendChild(v);
+    if(q.type!=="choice"){
+      const a=document.createElement('div'); a.className="answer";
+      if(q.type==="en2zh"){
+        a.innerHTML=`正解：<b>${esc(q.w.zh)}</b>`;
+      }else if(q.type==="cloze"){
+        const filled=esc(q.sentence).replace("{}",`<b>${esc(q.w.en)}</b>`);
+        a.innerHTML=`正解：<b>${esc(q.w.en)}</b>　${esc(q.w.zh)}<br>${filled}`;
+      }else{
+        a.innerHTML=`正解：<b>${esc(q.w.en)}</b>　${esc(q.w.zh)}`;
+      }
+      el.appendChild(a);
+    }
+    if(q.type==="en2zh" && !ok){
+      const s=document.createElement('div'); s.className="selfscore";
+      s.innerHTML=`我寫的其實對嗎？ <button data-i="${q.idx}">算我答對</button>`;
+      el.appendChild(s);
+      s.querySelector('button').addEventListener('click',(e)=>{
+        const b=e.target;
+        if(b.classList.contains('on')){ b.classList.remove('on'); b.textContent="算我答對"; q.right=false; }
+        else{ b.classList.add('on'); b.textContent="✓ 已算對"; q.right=true; }
+        updateScore();
+      });
+    }
+  });
+  updateScore();
+  document.getElementById('barInner').innerHTML=
+    `<button class="btn-ghost" id="backBtn2">重新設定</button>`+
+    `<button class="btn-dark" id="againBtn">再測一次</button>`;
+  document.getElementById('backBtn2').addEventListener('click',reset);
+  document.getElementById('againBtn').addEventListener('click',start);
+  document.getElementById('scoreBox').scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function updateScore(){
+  const total=questions.length;
+  const score=questions.filter(q=>q.right).length;
+  const pct=Math.round(score/total*100);
+  let msg="繼續加油！";
+  if(pct===100)msg="滿分！這幾個字穩了 🎉";
+  else if(pct>=80)msg="很不錯，錯的幾題再複習就好。";
+  else if(pct>=60)msg="有底子了，把紅框的字補起來。";
+  document.getElementById('scoreBox').innerHTML=
+    `<div class="score"><div class="big"><span>${score}</span> / ${total}</div><div class="lbl">答對 ${pct}%　·　${msg}</div></div>`;
+}
+
+function reset(){
+  document.getElementById('setup').classList.remove('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('bar').classList.add('hidden');
+  document.getElementById('scoreBox').innerHTML="";
+  document.getElementById('questions').innerHTML="";
+  checkBar();
+  document.getElementById('hdrSub').textContent="選好題型和題數，開始練習。";
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
