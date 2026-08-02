@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>單字測驗 1–120</title>
+<title>單字測驗 1–160</title>
 <style>
   :root{
     --paper:#FBFAF6; --ink:#1C1A15; --ink-soft:#6B665A;
@@ -31,10 +31,19 @@
   .chip.on .box{background:var(--hl);border-color:var(--hl-deep);}
   .chip.on .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid var(--ink);border-width:0 2.5px 2.5px 0;transform:rotate(42deg);}
   .count-row{display:flex;gap:10px;}
-  .count-row button{flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:12px 0;font-size:15px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;font-family:inherit;}
-  .count-row button.on{border-color:var(--ink);background:var(--hl);}
+  .range-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .count-row button,.range-grid button{flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:12px 0;font-size:15px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;font-family:inherit;}
+  .count-row button.on,.range-grid button.on{border-color:var(--ink);background:var(--hl);}
+  .custom{display:flex;align-items:center;gap:8px;margin-top:10px;}
+  .custom span{color:var(--ink-soft);font-weight:700;flex:0 0 auto;}
+  .custom input{width:100%;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:11px 8px;font-size:16px;font-weight:700;background:var(--paper);color:var(--ink);font-family:inherit;outline:none;transition:.15s;}
+  .custom input:focus{border-color:var(--ink);background:#fff;}
+  .hint{margin-top:10px;font-size:13px;color:var(--ink-soft);line-height:1.5;}
+  .hint b{color:var(--ink);}
+  .hint.warn b{color:var(--no);}
   .start{width:100%;margin-top:16px;border:none;border-radius:14px;background:var(--ink);color:var(--paper);font-size:17px;font-weight:800;padding:16px 0;cursor:pointer;font-family:inherit;letter-spacing:.02em;}
   .start:active{transform:translateY(1px);}
+  .start:disabled{opacity:.4;cursor:not-allowed;}
   .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 15px;margin-bottom:14px;}
   .q-top{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
   .q-num{font-size:13px;font-weight:800;color:var(--ink);background:var(--hl);border-radius:8px;padding:2px 9px;flex:0 0 auto;}
@@ -80,12 +89,29 @@
 <body>
 <div class="wrap">
   <header>
-    <div class="kicker">Vocabulary · 1–120</div>
+    <div class="kicker">Vocabulary · 1–160</div>
     <h1>單字<span class="mark">測驗</span></h1>
     <div class="sub" id="hdrSub">選好題型和題數，開始練習。</div>
   </header>
 
   <div id="setup">
+    <div class="panel">
+      <h2>範圍</h2>
+      <div class="range-grid" id="rangeRow">
+        <button data-all="1" class="on">全部</button>
+        <button data-from="1" data-to="40">1–40</button>
+        <button data-from="41" data-to="80">41–80</button>
+        <button data-from="81" data-to="120">81–120</button>
+        <button data-from="121" data-to="160">121–160</button>
+        <button data-custom="1">自訂</button>
+      </div>
+      <div class="custom hidden" id="customRow">
+        <input type="number" id="fromNo" inputmode="numeric" min="1" value="1">
+        <span>–</span>
+        <input type="number" id="toNo" inputmode="numeric" min="1" value="160">
+      </div>
+      <div class="hint" id="rangeHint"></div>
+    </div>
     <div class="panel">
       <h2>題型</h2>
       <div class="grid2" id="typeGrid">
@@ -101,7 +127,7 @@
       <div class="count-row" id="countRow">
         <button data-n="20" class="on">20 題</button>
         <button data-n="40">40 題</button>
-        <button data-n="120">全部 120</button>
+        <button data-n="0">範圍內全部</button>
       </div>
     </div>
     <button class="start" id="startBtn">開始測驗</button>
@@ -244,13 +270,92 @@ const WORDS = [
   {no:118,en:"power",zh:"[名]權力;動力",keys:["權力","動力","力量","電力"],ex:["The storm cut off the {}.","The king had great {}.","This machine needs more {}.","Knowledge is {}.","We lost {} during the typhoon."]},
   {no:119,en:"pray",zh:"[動]禱告",keys:["禱告","祈禱"],ex:["They {} before every meal.","She went to church to {}.","We {} for good weather tomorrow.","He closed his eyes to {}.","People {} for peace."]},
   {no:120,en:"prince",zh:"[名]王子",keys:["王子"],ex:["The {} lived in a big castle.","A brave {} saved the princess.","The young {} will become king.","She met a {} in her dream.","The {} rode a white horse."]},
+  {no:121,en:"princess",zh:"[名]公主",keys:["公主"],ex:["The {} wore a golden crown.","A {} lived in the tall tower.","The story is about a kind {}.","She dressed up as a {}.","The {} danced with the prince."]},
+  {no:122,en:"prize",zh:"[名]獎品",keys:["獎品","獎","獎項"],ex:["She won first {} in the contest.","The {} is a new bike.","He hopes to get a {} this year.","Everyone can win a small {}.","The {} was given to our class."]},
+  {no:123,en:"pumpkin",zh:"[名]南瓜",keys:["南瓜"],ex:["We made a {} pie for dinner.","The {} is big and orange.","He carved a face on the {}.","A {} grows on the ground.","She bought a {} at the market."]},
+  {no:124,en:"puppy",zh:"[名]小狗",keys:["小狗","幼犬"],ex:["The {} is only two months old.","A little {} followed me home.","She plays with her {} every day.","The {} barked at the mailman.","My {} likes to chew shoes."]},
+  {no:125,en:"quarter",zh:"[名]1/4;美金25分;15分鐘",keys:["四分之一","美金25分","25分","15分鐘","一刻鐘"],ex:["Cut the apple into a {} for me.","I paid with a {} and two dimes.","It is a {} past seven.","He ate a {} of the cake.","The class starts a {} after nine."]},
+  {no:126,en:"quiz",zh:"[名]小考",keys:["小考","測驗","隨堂測驗"],ex:["We have an English {} tomorrow.","The math {} was very short.","She got a good grade on the {}.","Our teacher gave us a surprise {}.","Study hard for the {} tonight."]},
+  {no:127,en:"race",zh:"[動]與...賽跑;[名]賽跑;(生物的)種類",keys:["賽跑","與...賽跑","比賽","種類","人種"],ex:["I will {} you to the gate.","He won the 100-meter {}.","The two boys {} after school.","The {} starts at nine o'clock.","People of every {} live here."]},
+  {no:128,en:"raise",zh:"[動]舉起;提高",keys:["舉起","提高","舉","抬起","養育"],ex:["Please {} your hand to answer.","They will {} the price next month.","Don't {} your voice at me.","She helped {} the heavy flag.","We must {} money for the school."]},
+  {no:129,en:"rat",zh:"[名]老鼠",keys:["老鼠","鼠"],ex:["A {} ran across the kitchen floor.","The cat caught a big {}.","A {} hid behind the boxes.","That {} has a long tail.","We saw a {} near the trash."]},
+  {no:130,en:"recorder",zh:"[名]錄影機;錄音機",keys:["錄影機","錄音機","錄音筆"],ex:["She turned on the {} to tape the song.","The {} is broken again.","He kept the interview on a {}.","Please bring a {} to the meeting.","The old {} still works well."]},
+  {no:131,en:"reporter",zh:"[名]記者",keys:["記者","新聞記者"],ex:["The {} asked many questions.","A TV {} came to our school.","She wants to be a {} someday.","The {} wrote about the fire.","A young {} took some photos."]},
+  {no:132,en:"rise",zh:"[動]起身;升起",keys:["起身","升起","上升","起立"],ex:["The sun will {} at six tomorrow.","Prices {} every year.","Please {} when the judge comes in.","We watched the balloon {} slowly.","Smoke began to {} from the roof."]},
+  {no:133,en:"robot",zh:"[名]機器人",keys:["機器人"],ex:["The {} can clean the whole room.","He built a small {} for class.","A {} works in the factory.","The {} moved its arms slowly.","Children love that toy {}."]},
+  {no:134,en:"rock",zh:"[動]搖動;[名]岩石;搖滾樂",keys:["搖動","岩石","搖滾樂","石頭","搖滾"],ex:["A big {} fell down the hill.","She likes to listen to {} music.","The waves {} the little boat.","He sat on a flat {} to rest.","Please {} the baby to sleep."]},
+  {no:135,en:"roll",zh:"[動]捲;滾",keys:["捲","滾","滾動","翻滾"],ex:["The ball began to {} down the street.","Please {} up your sleeves.","Watch the coin {} under the desk.","We {} the dough into a long tube.","The dog likes to {} on the grass."]},
+  {no:136,en:"rope",zh:"[名]粗繩",keys:["粗繩","繩子","繩"],ex:["He tied the boat with a thick {}.","The {} is too short to use.","She jumped over the {}.","Pull the {} as hard as you can.","A long {} hung from the tree."]},
+  {no:137,en:"row",zh:"[動]划船;[名]行列",keys:["划船","行列","一排","排","划"],ex:["Let's {} the boat across the lake.","We sat in the first {}.","There is a {} of trees by the road.","He can {} for hours without rest.","The books stand in a neat {}."]},
+  {no:138,en:"sail",zh:"[動]航行",keys:["航行","航","啟航","開船"],ex:["The ship will {} at dawn.","They plan to {} around the island.","We watched the boat {} away.","He learned to {} last summer.","The team will {} across the bay."]},
+  {no:139,en:"salesman",zh:"[名]售貨員",keys:["售貨員","推銷員","業務員","銷售員"],ex:["The {} showed me a new phone.","A {} knocked on our door.","He works as a car {}.","The {} was very polite.","Ask the {} for a smaller size."]},
+  {no:140,en:"scared",zh:"[形]害怕的",keys:["害怕的","害怕","恐懼的","驚恐的"],ex:["She is {} of the dark.","The boy looked {} after the noise.","Don't be {}; I am here.","He was too {} to say a word.","The {} cat ran up the tree."]},
+  {no:141,en:"science",zh:"[名]科學",keys:["科學","自然科學"],ex:["{} is my favorite subject.","We did an experiment in {} class.","She loves to read about {}.","The {} teacher is very funny.","Modern {} changes our life."]},
+  {no:142,en:"scooter",zh:"[名]小輪摩托車",keys:["小輪摩托車","機車","摩托車","速克達","滑板車"],ex:["He rides a {} to work.","The {} is parked by the gate.","She bought a red {} last week.","A {} uses very little gas.","Wear a helmet on the {}."]},
+  {no:143,en:"screen",zh:"[名]屏;銀幕",keys:["屏","銀幕","螢幕","屏幕"],ex:["The movie {} is very wide.","Don't sit too close to the {}.","Her phone {} is broken.","Words appeared on the {}.","The {} went black suddenly."]},
+  {no:144,en:"secretary",zh:"[名]秘書",keys:["秘書","祕書"],ex:["The {} answered the phone.","She works as a {} in that office.","Ask the {} about the meeting.","A busy {} typed the letters.","The {} keeps the schedule."]},
+  {no:145,en:"seed",zh:"[名]種子",keys:["種子","籽","種"],ex:["Plant the {} in soft soil.","A tiny {} became a big tree.","She found a {} in the fruit.","Birds eat every {} on the ground.","Water the {} every morning."]},
+  {no:146,en:"seesaw",zh:"[名]蹺蹺板",keys:["蹺蹺板","翹翹板"],ex:["The children played on the {}.","A {} needs two people.","The {} in the park is new.","She sat on one end of the {}.","We rode the {} up and down."]},
+  {no:147,en:"shake",zh:"[動]搖動;握(手);[名]搖動;奶昔",keys:["搖動","握手","奶昔","搖","搖晃"],ex:["Please {} the bottle before you drink.","They {} hands after the game.","I want a chocolate {}.","The wind made the windows {}.","Don't {} the table while I write."]},
+  {no:148,en:"shark",zh:"[名]鯊魚",keys:["鯊魚","鯊"],ex:["A {} swam near the boat.","The {} has very sharp teeth.","We saw a {} at the aquarium.","A big {} scared the swimmers.","The {} is a fast hunter."]},
+  {no:149,en:"sharp",zh:"[形]尖銳的;敏銳的",keys:["尖銳的","敏銳的","鋒利的","銳利的","尖銳"],ex:["This knife is very {}.","Be careful of the {} corner.","She has a {} mind for math.","The dog has a {} sense of smell.","Use a {} pencil for the test."]},
+  {no:150,en:"shine",zh:"[動]照耀",keys:["照耀","發光","閃耀","照亮"],ex:["The sun will {} all afternoon.","Stars {} brightly at night.","Let the light {} on the stage.","Her eyes {} when she smiles.","The moon began to {} on the lake."]},
+  {no:151,en:"shorts",zh:"[名]短褲",keys:["短褲"],ex:["He wears {} in the summer.","My {} are blue and white.","She put on {} for the game.","These {} are too big for me.","Bring a pair of {} to the beach."]},
+  {no:152,en:"shout",zh:"[動]呼叫",keys:["呼叫","大叫","喊叫","喊","叫"],ex:["Don't {} in the library.","He had to {} over the noise.","She began to {} for help.","They {} when their team scores.","Please don't {} at your sister."]},
+  {no:153,en:"sight",zh:"[名]視力;景象",keys:["視力","景象","視覺","風景"],ex:["My grandpa is losing his {}.","The sunset was a beautiful {}.","Good {} is important for drivers.","The city at night is a lovely {}.","The ship sailed out of {}."]},
+  {no:154,en:"sign",zh:"[動]簽字;做信號;[名]記號",keys:["簽字","做信號","記號","標誌","簽名"],ex:["Please {} your name here.","The road {} says to turn left.","He gave me a {} to be quiet.","A red {} warned us of danger.","You must {} the letter today."]},
+  {no:155,en:"skate",zh:"[動]溜冰;[名]冰鞋",keys:["溜冰","冰鞋","滑冰","溜冰鞋"],ex:["We {} on the lake in winter.","She can {} very fast.","My new {} is too tight.","Let's {} at the ice rink.","He put on one {} at a time."]},
+  {no:156,en:"slide",zh:"[動]滑壘;滑動;[名]滑梯;土崩",keys:["滑壘","滑動","滑梯","土崩","溜滑梯","滑"],ex:["The children {} down the hill.","The park has a tall {}.","Don't {} on the wet floor.","A mud {} closed the road.","He tried to {} into second base."]},
+  {no:157,en:"slim",zh:"[形]細長的;微小的",keys:["細長的","微小的","苗條的","纖細的","苗條"],ex:["She is tall and {}.","The chance of rain is {}.","He has a {} face.","A {} book fits in my bag.","There is a {} hope of winning."]},
+  {no:158,en:"snowman",zh:"[名]雪人",keys:["雪人"],ex:["We built a {} in the yard.","The {} has a carrot nose.","A big {} stood by the door.","The {} melted in the sun.","Children love to make a {}."]},
+  {no:159,en:"snowy",zh:"[形]似雪的;多雪的",keys:["似雪的","多雪的","下雪的","雪白的"],ex:["It is cold and {} today.","We walked on the {} road.","The mountain looks {} in winter.","A {} day is perfect for skiing.","She loves {} weather."]},
+  {no:160,en:"soccer",zh:"[名]足球",keys:["足球"],ex:["They play {} after school.","{} is popular around the world.","He joined the school {} team.","We watched a {} game on TV.","She kicked the {} into the goal."]},
 ];
 
 const TYPE_LABEL = {choice:"選擇題",spell:"填空題",zh2en:"中翻英",en2zh:"英翻中",cloze:"例句填空"};
+const MAX_NO = WORDS.reduce((m,w)=>Math.max(m,w.no),0);
 let picked = {choice:true,spell:true,zh2en:true,en2zh:true,cloze:true};
 let count = 20;
+let rangeFrom = 1, rangeTo = MAX_NO;
 let questions = [];
 let graded = false;
+
+function inRange(){return WORDS.filter(w=>w.no>=rangeFrom&&w.no<=rangeTo);}
+function readCustom(){
+  const f=document.getElementById('fromNo'), t=document.getElementById('toNo');
+  let a=parseInt(f.value,10), b=parseInt(t.value,10);
+  if(isNaN(a))a=1; if(isNaN(b))b=MAX_NO;
+  a=Math.min(Math.max(a,1),MAX_NO); b=Math.min(Math.max(b,1),MAX_NO);
+  if(a>b){const s=a;a=b;b=s;}
+  f.value=a; t.value=b; rangeFrom=a; rangeTo=b;
+}
+function updateHint(){
+  const n=inRange().length, m=count===0?n:Math.min(count,n);
+  const short=count!==0&&count>n;
+  const h=document.getElementById('rangeHint');
+  h.className="hint"+(short||!n?" warn":"");
+  h.innerHTML=n? `第 <b>${rangeFrom}–${rangeTo}</b> 號共 <b>${n}</b> 個單字，這次出 <b>${m}</b> 題`+(short?"（不足 "+count+" 題）":"")
+                : `這個範圍<b>沒有單字</b>，請重新選擇`;
+  document.getElementById('startBtn').disabled=!n;
+}
+
+document.querySelectorAll('#rangeRow button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#rangeRow button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const custom=!!b.dataset.custom;
+    document.getElementById('customRow').classList.toggle('hidden',!custom);
+    if(custom) readCustom();
+    else if(b.dataset.all){ rangeFrom=1; rangeTo=MAX_NO; }
+    else{ rangeFrom=parseInt(b.dataset.from,10); rangeTo=Math.min(parseInt(b.dataset.to,10),MAX_NO); }
+    updateHint();
+  });
+});
+['fromNo','toNo'].forEach(id=>{
+  const el=document.getElementById(id); el.max=MAX_NO;
+  el.addEventListener('change',()=>{readCustom();updateHint();});
+});
+document.getElementById('toNo').value=MAX_NO;
 
 document.querySelectorAll('#typeGrid .chip').forEach(c=>{
   c.addEventListener('click',()=>{
@@ -263,9 +368,10 @@ document.querySelectorAll('#typeGrid .chip').forEach(c=>{
 document.querySelectorAll('#countRow button').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('#countRow button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); count=parseInt(b.dataset.n,10);
+    b.classList.add('on'); count=parseInt(b.dataset.n,10); updateHint();
   });
 });
+updateHint();
 document.getElementById('startBtn').addEventListener('click',start);
 document.getElementById('checkBtn').addEventListener('click',check);
 document.getElementById('backBtn').addEventListener('click',reset);
@@ -298,13 +404,15 @@ function checkBar(){
 
 function start(){
   const types=Object.keys(picked).filter(t=>picked[t]);
-  const pool=shuffle(WORDS).slice(0,count);
+  const scope=inRange(); if(!scope.length) return;
+  const pool=shuffle(scope).slice(0,count===0?scope.length:count);
   questions=pool.map((w,i)=>{
     let type=types[Math.floor(Math.random()*types.length)];
     if(type==="cloze" && (!w.ex||!w.ex.length)) type="spell";
     const q={idx:i,type,w,ans:null};
     if(type==="choice"){
-      const others=shuffle(WORDS.filter(x=>x.no!==w.no)).slice(0,3);
+      let others=shuffle(scope.filter(x=>x.no!==w.no)).slice(0,3);
+      if(others.length<3) others=shuffle(WORDS.filter(x=>x.no!==w.no)).slice(0,3);
       q.dir = Math.random()<0.5 ? "en2zh":"zh2en";
       if(q.dir==="en2zh"){ q.prompt=w.en; q.options=shuffle([w,...others]).map(x=>x.zh); q.correct=w.zh; }
       else{ q.prompt=w.zh; q.options=shuffle([w,...others]).map(x=>x.en); q.correct=w.en; }
@@ -322,7 +430,7 @@ function start(){
   document.getElementById('setup').classList.add('hidden');
   document.getElementById('quiz').classList.remove('hidden');
   document.getElementById('bar').classList.remove('hidden');
-  document.getElementById('hdrSub').textContent="作答完後，按下方「一鍵對答案」。";
+  document.getElementById('hdrSub').textContent=`第 ${rangeFrom}–${rangeTo} 號 · ${questions.length} 題，作答完按下方「一鍵對答案」。`;
   window.scrollTo(0,0);
 }
 
@@ -445,7 +553,8 @@ function reset(){
   document.getElementById('scoreBox').innerHTML="";
   document.getElementById('questions').innerHTML="";
   checkBar();
-  document.getElementById('hdrSub').textContent="選好題型和題數，開始練習。";
+  updateHint();
+  document.getElementById('hdrSub').textContent="選好範圍、題型和題數，開始練習。";
   window.scrollTo(0,0);
 }
 </script>
